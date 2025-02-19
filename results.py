@@ -3,19 +3,14 @@ from pymatgen.analysis.structure_matcher import StructureMatcher
 from pymatgen.ext.matproj import MPRester
 import os
 
-# Replace with your NEW Materials Project API key
-MATERIALS_PROJECT_API_KEY = "H0XbrfDs0BYaDbuGHkj56BaRhGeqbz9T"  # Keep this private!
+MATERIALS_PROJECT_API_KEY = "API" 
+mpr = MPRester(API")
 
-# Initialize the Materials Project API
-mpr = MPRester("H0XbrfDs0BYaDbuGHkj56BaRhGeqbz9T")
-
-# Initialize StructureMatcher
 matcher = StructureMatcher()
 
-# Your local path to CIF files
+# My local 
 cif_folder = r"C:\Users\Leon\Downloads\UW-Madison-25\tmp_results\7.0"
 
-# Check if folder exists
 if not os.path.exists(cif_folder):
     print(f"\n❌ Error: The folder path '{cif_folder}' does not exist.")
     exit()
@@ -30,16 +25,21 @@ if not cif_files:
 print(f"\n📂 Found {len(cif_files)} CIF files. Processing the first 3...")
 
 # Read and process CIF files
-pymatgen_structures = {}
-extracted_formulas = []
+pymatgen_structures = {}  # Dictionary to store loaded structures
+extracted_formulas = []   # List to store extracted chemical formulas
 
-for cif_file in cif_files[:128]:  # Process first 3 files as a test
+for cif_file in cif_files[:128]:  # Process first 128 files as a test
     file_path = os.path.join(cif_folder, cif_file)
     print(f"📖 Reading {cif_file}...")
 
     try:
+        # Load the structure from the CIF file
         structure = Structure.from_file(file_path)
-        formula = structure.composition.alphabetical_formula  # Standardized formula
+        
+        # Extract the standardized chemical formula (alphabetical order)
+        formula = structure.composition.alphabetical_formula
+        
+        # Store the structure and formula for later use
         pymatgen_structures[cif_file] = structure
         extracted_formulas.append(formula)
         print(f"✅ Successfully loaded {cif_file} | Extracted Formula: {formula}")
@@ -51,14 +51,16 @@ print("\n🔍 Extracted formulas for lookup:", extracted_formulas)
 
 # Query Materials Project database for each formula INDIVIDUALLY
 if extracted_formulas:
-    matched_results = {}
+    matched_results = {}  # Dictionary to store matching results
 
     for formula in extracted_formulas:
         try:
             print(f"\n🔎 Searching for: {formula} in Materials Project...")
+            # Query Materials Project for structures matching the formula
             existing_materials = mpr.get_structures(formula)
 
             if existing_materials:
+                # If a match is found, store the first matching structure's formula
                 print(f"✅ Match found for {formula}")
                 matched_results[formula] = existing_materials[0].composition.formula
             else:
@@ -70,6 +72,7 @@ if extracted_formulas:
 # Print final results
 if matched_results:
     print("\n✅ Matching structures found in Materials Project:")
+    # Iterate through matched results and print the original and matched formulas
     for formula, matched_formula in matched_results.items():
         print(f"{formula} → {matched_formula}")
 else:
