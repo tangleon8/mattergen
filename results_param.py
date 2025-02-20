@@ -1,3 +1,4 @@
+
 from pymatgen.core import Structure
 from pymatgen.analysis.structure_matcher import StructureMatcher, OrderDisorderElementComparator
 from pymatgen.ext.matproj import MPRester
@@ -20,7 +21,7 @@ matcher = StructureMatcher(
 )
 
 # local
-cif_folder = r"C:\Users\Leon\Downloads\UW-Madison-25\tmp_results\2.0"
+cif_folder = r"C:\Users\Leon\OneDrive\Documents\generated_crystals_cif_4.0\tmp"
 
 # Check if folder exists
 if not os.path.exists(cif_folder):
