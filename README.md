@@ -1,101 +1,167 @@
-# CIF File Processor and Materials Project Matcher
+Materials Structure Matching and Novelty Analysis
 
-This Python script processes CIF (Crystallographic Information File) files, extracts their chemical formulas, and queries the Materials Project database to find matching structures. It uses the `pymatgen` library for structure manipulation and analysis.
+Overview
 
-## Prerequisites
+This project utilizes the pymatgen library to process CIF (Crystallographic Information File) structures, extract chemical formulas, and compare them against existing materials in the Materials Project database. The primary objectives of this project include:
 
-Before running the script, ensure you have the following:
+Matching structures found in CIF files with those in the Materials Project database.
 
-1. **Python 3.x** installed on your system.
-2. **Pymatgen** library installed. You can install it using pip:
-   ```bash
-   pip install pymatgen
-   ```
-3. An **API key** from the [Materials Project](https://materialsproject.org/). Replace `"API"` in the script with your actual API key.
+Identifying novel structures that do not exist in the database.
 
-## Script Overview
+Analyzing and reporting on the materials dataset using advanced structure matching techniques.
 
-The script performs the following tasks:
+Calculating ratios of novel vs. known materials for research insights.
 
-1. **Load CIF Files**: Reads CIF files from a specified folder.
-2. **Extract Chemical Formulas**: Extracts the chemical formulas from the CIF files.
-3. **Query Materials Project**: Searches the Materials Project database for structures matching the extracted formulas.
-4. **Output Results**: Prints the matching structures found in the Materials Project.
+Files and Functionality
 
-## Usage
+1. results_param.py
 
-1. **Set the CIF Folder Path**: Modify the `cif_folder` variable to point to the folder containing your CIF files.
-   ```python
-   cif_folder = r"C:\Users\Leon\Downloads\UW-Madison-25\tmp_results\7.0"
-   ```
+Purpose
 
-2. **Set the Materials Project API Key**: Replace `"API"` with your actual Materials Project API key.
-   ```python
-   MATERIALS_PROJECT_API_KEY = "API"
-   ```
+This script processes a collection of CIF files, extracts their chemical compositions, and attempts to match them with known structures in the Materials Project database using StructureMatcher.
 
-3. **Run the Script**: Execute the script in your Python environment.
-   ```bash
-   python script_name.py
-   ```
+Key Features
 
-## Script Details
+Reads up to 128 CIF files from a specified folder.
 
-### Key Variables
+Uses pymatgen to parse CIF files and extract chemical formulas in alphabetical order.
 
-- `cif_folder`: Path to the folder containing CIF files.
-- `MATERIALS_PROJECT_API_KEY`: Your Materials Project API key.
-- `cif_files`: List of CIF files in the specified folder.
-- `pymatgen_structures`: Dictionary to store loaded structures.
-- `extracted_formulas`: List to store extracted chemical formulas.
-- `matched_results`: Dictionary to store matching results from the Materials Project.
+Connects to the Materials Project API using an API key to query structures.
 
-### Functions
+Utilizes StructureMatcher with specific comparison parameters:
 
-- **Structure.from_file(file_path)**: Loads a structure from a CIF file.
-- **structure.composition.alphabetical_formula**: Extracts the chemical formula in alphabetical order.
-- **mpr.get_structures(formula)**: Queries the Materials Project for structures matching the given formula.
+Lattice tolerance: ltol=0.2 (adjusts for minor deviations in lattice parameters).
 
-### Error Handling
+Site tolerance: stol=0.3 (allows for atomic position variations).
 
-- The script checks if the specified folder exists and contains CIF files.
-- It handles exceptions during file loading and Materials Project queries, printing error messages as needed.
+Angle tolerance: 5.0 degrees.
 
-## Example Output
+Primitive cell comparison, scaling enabled, and order-disorder comparator.
 
-```
-📂 Found 128 CIF files. Processing the first 3...
-📖 Reading file1.cif...
-✅ Successfully loaded file1.cif | Extracted Formula: Al2O3
-📖 Reading file2.cif...
-✅ Successfully loaded file2.cif | Extracted Formula: SiO2
-📖 Reading file3.cif...
-✅ Successfully loaded file3.cif | Extracted Formula: NaCl
+Compares each local structure to all retrieved structures from Materials Project.
 
-🔍 Extracted formulas for lookup: ['Al2O3', 'SiO2', 'NaCl']
+Outputs whether a match is found or not for each CIF file.
 
-🔎 Searching for: Al2O3 in Materials Project...
-✅ Match found for Al2O3
-🔎 Searching for: SiO2 in Materials Project...
-✅ Match found for SiO2
-🔎 Searching for: NaCl in Materials Project...
-✅ Match found for NaCl
+Provides an overview of extracted formulas for verification.
 
-✅ Matching structures found in Materials Project:
-Al2O3 → Al2O3
-SiO2 → SiO2
-NaCl → NaCl
-```
+How to Use
 
-## Notes
+Run the script in a Python environment:
 
-- The script processes the first 128 CIF files by default. You can modify the range in the loop to process more or fewer files.
-- Ensure your API key has sufficient permissions to query the Materials Project database.
+python results_param.py
 
-## License
+Ensure that the CIF folder path is correctly set before execution.
 
-This script is provided under the MIT License. Feel free to modify and distribute it as needed.
+2. results.py
 
----
+Purpose
 
-For any issues or questions, please refer to the [Pymatgen documentation](https://pymatgen.org/) or contact the script author.
+This script is similar to results_param.py but is designed for quick verification by processing only the first three CIF files.
+
+Key Features
+
+Processes up to 3 CIF files instead of 128.
+
+Extracts chemical formulas and queries the Materials Project database.
+
+Uses a default StructureMatcher configuration for comparison.
+
+Instead of comparing with all retrieved structures, it matches against the first found structure.
+
+Outputs matching results in a concise format.
+
+How to Use
+
+python results.py
+
+Modify the CIF folder path inside the script before running.
+
+3. novel.py
+
+Purpose
+
+This script determines the novelty of materials structures by checking whether they exist in the Materials Project database.
+
+Key Features
+
+Processes all CIF files found in the given folder.
+
+Uses a fine-tuned StructureMatcher with the same tolerance values as results_param.py.
+
+Tracks whether a structure exists in the Materials Project or is novel.
+
+Classifies each CIF file into:
+
+Novel Structure (not found in Materials Project).
+
+Existing Structure (found in Materials Project and matched).
+
+Unknown (query error or API limitation).
+
+Calculates and displays the ratio of novel structures in the dataset.
+
+Output Format
+
+The script prints:
+
+Structure Status:
+file1.cif: novel
+file2.cif: exists in MP
+file3.cif: could not be checked
+
+Overall ratio of novel structures: 67% (10/15)
+
+How to Use
+
+python novel.py
+
+Ensure that the CIF file directory is correctly configured.
+
+Dependencies
+
+Make sure you have the required Python packages installed:
+
+pip install pymatgen
+
+API Key Requirement
+
+To query the Materials Project API, you need to set up an API key:
+
+Register at Materials Project.
+
+Retrieve your API Key from your account settings.
+
+Replace the placeholder MATERIALS_PROJECT_API_KEY in each script with your actual key.
+
+Expected Output
+
+Depending on the script executed, the expected results include:
+
+The number of CIF files processed.
+
+Extracted chemical formulas.
+
+Match results for each structure against the Materials Project database.
+
+Novelty assessment and ratio calculations (for novel.py).
+
+Notes
+
+Ensure the CIF folder path is correctly set in each script before execution.
+
+The API key must be valid for queries to work properly.
+
+Adjust parameters in StructureMatcher to fine-tune the comparison criteria.
+
+Some structures might be similar but not identical; StructureMatcher helps detect minor variations.
+
+License
+
+This project is for research and educational purposes only.
+
+Author
+
+Leon Tang
+
+For any issues or inquiries, feel free to reach out.
+
